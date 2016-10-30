@@ -1,0 +1,48 @@
+@import "bourbon"
+@import "vars.sass"
+@import "fonts.sass"
+
+
+body
+	font-size: 16px
+	min-width: 320px
+	position: relative
+	line-height: 1.6
+	font-family: "RobotoRegular", sans-serif
+	overflow-x: hidden
+	background-color: #e3e3e3
+
+.hidden
+	display: none
+
+*::-webkit-input-placeholder
+	color: #666
+	opacity: 1
+
+*:-moz-placeholder
+	color: #666
+	opacity: 1
+
+*::-moz-placeholder
+	color: #666
+	opacity: 1
+
+*:-ms-input-placeholder
+	color: #666
+	opacity: 1
+
+body input:focus:required:invalid,
+body textarea:focus:required:invalid
+	color: #666
+body input:required:valid,
+body textarea:required:valid
+	color: #666
+
+//Custom Styles Here
+.text-center
+	text-align: center
+
+
+
+//ALWAYS END
+@import "media.sass"
