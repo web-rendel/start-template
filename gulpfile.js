@@ -1,7 +1,7 @@
 var gulp = require('gulp'),
     watch = require('gulp-watch'),
     sass = require('gulp-sass'),
-    jade = require('gulp-jade'),
+    pug = require('gulp-pug'),
     uglify = require('gulp-uglify'),
     cssmin = require('gulp-minify-css'),
     imagemin = require('gulp-imagemin'),
@@ -31,34 +31,34 @@ var gulp = require('gulp'),
   var requirences = {
     css: [
       './src/libs/bootstrap/bootstrap.css',
-      './bower_components/animate.css/animate.min.css',
+      // './bower_components/animate.css/animate.min.css',
       './src/libs/font-awesome/css/font-awesome.css'
     ],
     js: [
-      './bower_components/jquery/dist/jquery.min.js',
+      './node_modules/jquery/dist/jquery.min.js',
       './src/libs/modernizr/modernizr.js',
-      './bower_components/respond/dest/respond.min.js'
+      // './bower_components/respond/dest/respond.min.js'
     ]
   }
 
 // пути для дальнейшей сборки
   var path = {
     build:{ //тут мы укажем куда складывать готовые после сборки файлы
-      jade: 'app/',
+      pug: 'app/',
       sass: 'app/css/',
       js: 'app/js/',
       img: 'app/img/',
       fonts: 'app/fonts/'
     },
     src:{ //Пути откуда брать исходники
-      jade: 'src/jade/*.jade',
+      pug: 'src/pug/*.pug',
       sass: 'src/sass/*.sass',
       js: 'src/js/*.js',
       img: 'src/img/**/*.*',
       fonts: 'src/fonts/**/*.*'
     },
     watch:{ //Тут мы укажем, за изменением каких файлов мы хотим наблюдать
-      jade: 'src/jade/*.jade',
+      pug: 'src/pug/*.pug',
       sass: 'src/sass/*.sass',
       js: 'src/js/*.js',
       img: 'src/img/**/*.*',
@@ -84,14 +84,14 @@ var gulp = require('gulp'),
        .pipe(reload({stream: true})); //И перезагрузим наш сервер для обновлений
   });
 
-// собираем jade и компилим в html
-  gulp.task('jade:build', function(){
-    gulp.src(path.src.jade) //Выберем файлы по нужному пути
-      .pipe(jade({ // компилим их в html
+// собираем pug и компилим в html
+  gulp.task('pug:build', function(){
+    gulp.src(path.src.pug) //Выберем файлы по нужному пути
+      .pipe(pug({ // компилим их в html
         clients:true,
         pretty: true
       }))
-      .pipe(gulp.dest(path.build.jade)) //билдим их в папку app
+      .pipe(gulp.dest(path.build.pug)) //билдим их в папку app
       .pipe(reload({stream: true})); //И перезагрузим наш сервер для обновлений
   });
 
@@ -139,7 +139,7 @@ var gulp = require('gulp'),
 
 // соберем все таски в один
   gulp.task('build', [
-    'jade:build',
+    'pug:build',
     'sass:build',
     'js:build',
     'image:build',
@@ -160,7 +160,7 @@ gulp.task('clean', function (cb) {
 
 // watch за всеми тасками
   gulp.task('watch', function(){
-    gulp.watch(path.watch.jade, ['jade:build']);
+    gulp.watch(path.watch.pug, ['pug:build']);
     gulp.watch(path.watch.sass, ['sass:build']);
     gulp.watch(path.watch.js,   ['js:build']);
   });
