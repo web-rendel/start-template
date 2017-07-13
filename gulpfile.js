@@ -6,12 +6,11 @@ var gulp = require('gulp'),
     cssmin = require('gulp-minify-css'),
     imagemin = require('gulp-imagemin'),
     sourcemaps = require('gulp-sourcemaps'),
-    pngquant = require('imagemin-pngquant')
     autoprefixer = require('gulp-autoprefixer'),
     concatJS = require('gulp-concat'),
     concatCSS = require('gulp-concat-css'),
     browserSync = require('browser-sync'),
-    rimraf = require('rimraf'),
+    del = require('del'),
     reload = browserSync.reload;
 
 
@@ -101,8 +100,9 @@ var gulp = require('gulp'),
         .pipe(sourcemaps.init()) // инициализируем sourcemap
         .pipe(sass({includePaths: require('node-bourbon').includePaths }).on('error', sass.logError))
         .pipe(sass({outputStyle: 'expanded'}).on('error', sass.logError)) // посмотреть вместо expanded -compressed
-        .pipe(autoprefixer({browsers: ['last 15 versions'], cascade: false}))
+        .pipe(autoprefixer({browsers: ['last 2 versions'], cascade: false}))
         //.pipe(cssmin()) // сжимаем наш sass
+        .pipe(concatCSS('main.css'))
         .pipe(sourcemaps.write()) // пропишем карты
         .pipe(gulp.dest(path.build.sass)) // билдим файл в папку app
         .pipe(reload({stream: true})); //И перезагрузим наш сервер для обновлений
@@ -118,18 +118,35 @@ var gulp = require('gulp'),
       .pipe(reload({stream: true})); //И перезагрузим наш сервер для обновлений
   });
 
-  //собираем картинки
+//собираем картинки
+  //  gulp.task('image:build', function(){
+  //     gulp.src(path.src.img)
+  //       .pipe(gulp.dest(path.build.img));
+  //   });
+
   gulp.task('image:build', function(){
-    gulp.src(path.src.img) // выюираем наши картинки
-      .pipe(imagemin({ // сжимаем их
-        progressive: true,
-        svgoPlugins: [{removeViewBox: false}],
-        use: [pngquant()],
-        interlaced: true
-      }))
-      .pipe(gulp.dest(path.build.img)) // бросаем их в папку app
+    gulp.src(path.src.img)
+      .pipe(imagemin([
+        imagemin.gifsicle({interlaced: true}),
+        imagemin.jpegtran({progressive: true}),
+        imagemin.optipng({optimizationLevel: 5}),
+        imagemin.svgo({plugins: [{removeViewBox: true}]})
+      ]))
+      .pipe(gulp.dest(path.build.img))
       .pipe(reload({stream:true}));
   });
+
+  // gulp.task('image:build', function(){
+  //   gulp.src(path.src.img) // выбираем наши картинки
+  //     .pipe(imagemin({ // сжимаем их
+  //       progressive: true,
+  //       svgoPlugins: [{removeViewBox: false}],
+  //       use: [imageminPngquant()],
+  //       interlaced: true
+  //     }))
+  //     .pipe(gulp.dest(path.build.img)) // бросаем их в папку app
+  //     .pipe(reload({stream:true}));
+  // });
 
 // собираем шрифты
   gulp.task('fonts:build', function(){
@@ -154,8 +171,8 @@ gulp.task('webserver',['build'], function () {
 });
 
 // очистка
-gulp.task('clean', function (cb) {
-  rimraf(path.clean, cb);
+gulp.task('clean', function() {
+  return del(path.clean);
 });
 
 // watch за всеми тасками
