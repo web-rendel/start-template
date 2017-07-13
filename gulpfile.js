@@ -1,17 +1,16 @@
 var gulp = require('gulp'),
     watch = require('gulp-watch'),
     sass = require('gulp-sass'),
-    jade = require('gulp-jade'),
+    pug = require('gulp-pug'),
     uglify = require('gulp-uglify'),
     cssmin = require('gulp-minify-css'),
     imagemin = require('gulp-imagemin'),
     sourcemaps = require('gulp-sourcemaps'),
-    pngquant = require('imagemin-pngquant')
     autoprefixer = require('gulp-autoprefixer'),
     concatJS = require('gulp-concat'),
     concatCSS = require('gulp-concat-css'),
     browserSync = require('browser-sync'),
-    rimraf = require('rimraf'),
+    del = require('del'),
     reload = browserSync.reload;
 
 
@@ -31,34 +30,34 @@ var gulp = require('gulp'),
   var requirences = {
     css: [
       './src/libs/bootstrap/bootstrap.css',
-      './bower_components/animate.css/animate.min.css',
+      // './bower_components/animate.css/animate.min.css',
       './src/libs/font-awesome/css/font-awesome.css'
     ],
     js: [
-      './bower_components/jquery/dist/jquery.min.js',
+      './node_modules/jquery/dist/jquery.min.js',
       './src/libs/modernizr/modernizr.js',
-      './bower_components/respond/dest/respond.min.js'
+      // './bower_components/respond/dest/respond.min.js'
     ]
   }
 
 // пути для дальнейшей сборки
   var path = {
     build:{ //тут мы укажем куда складывать готовые после сборки файлы
-      jade: 'app/',
+      pug: 'app/',
       sass: 'app/css/',
       js: 'app/js/',
       img: 'app/img/',
       fonts: 'app/fonts/'
     },
     src:{ //Пути откуда брать исходники
-      jade: 'src/jade/*.jade',
+      pug: 'src/pug/*.pug',
       sass: 'src/sass/*.sass',
       js: 'src/js/*.js',
       img: 'src/img/**/*.*',
       fonts: 'src/fonts/**/*.*'
     },
     watch:{ //Тут мы укажем, за изменением каких файлов мы хотим наблюдать
-      jade: 'src/jade/*.jade',
+      pug: 'src/pug/*.pug',
       sass: 'src/sass/*.sass',
       js: 'src/js/*.js',
       img: 'src/img/**/*.*',
@@ -84,14 +83,14 @@ var gulp = require('gulp'),
        .pipe(reload({stream: true})); //И перезагрузим наш сервер для обновлений
   });
 
-// собираем jade и компилим в html
-  gulp.task('jade:build', function(){
-    gulp.src(path.src.jade) //Выберем файлы по нужному пути
-      .pipe(jade({ // компилим их в html
+// собираем pug и компилим в html
+  gulp.task('pug:build', function(){
+    gulp.src(path.src.pug) //Выберем файлы по нужному пути
+      .pipe(pug({ // компилим их в html
         clients:true,
         pretty: true
       }))
-      .pipe(gulp.dest(path.build.jade)) //билдим их в папку app
+      .pipe(gulp.dest(path.build.pug)) //билдим их в папку app
       .pipe(reload({stream: true})); //И перезагрузим наш сервер для обновлений
   });
 
@@ -101,8 +100,9 @@ var gulp = require('gulp'),
         .pipe(sourcemaps.init()) // инициализируем sourcemap
         .pipe(sass({includePaths: require('node-bourbon').includePaths }).on('error', sass.logError))
         .pipe(sass({outputStyle: 'expanded'}).on('error', sass.logError)) // посмотреть вместо expanded -compressed
-        .pipe(autoprefixer({browsers: ['last 15 versions'], cascade: false}))
+        .pipe(autoprefixer({browsers: ['last 2 versions'], cascade: false}))
         //.pipe(cssmin()) // сжимаем наш sass
+        .pipe(concatCSS('main.css'))
         .pipe(sourcemaps.write()) // пропишем карты
         .pipe(gulp.dest(path.build.sass)) // билдим файл в папку app
         .pipe(reload({stream: true})); //И перезагрузим наш сервер для обновлений
@@ -118,18 +118,35 @@ var gulp = require('gulp'),
       .pipe(reload({stream: true})); //И перезагрузим наш сервер для обновлений
   });
 
-  //собираем картинки
+//собираем картинки
+  //  gulp.task('image:build', function(){
+  //     gulp.src(path.src.img)
+  //       .pipe(gulp.dest(path.build.img));
+  //   });
+
   gulp.task('image:build', function(){
-    gulp.src(path.src.img) // выюираем наши картинки
-      .pipe(imagemin({ // сжимаем их
-        progressive: true,
-        svgoPlugins: [{removeViewBox: false}],
-        use: [pngquant()],
-        interlaced: true
-      }))
-      .pipe(gulp.dest(path.build.img)) // бросаем их в папку app
+    gulp.src(path.src.img)
+      .pipe(imagemin([
+        imagemin.gifsicle({interlaced: true}),
+        imagemin.jpegtran({progressive: true}),
+        imagemin.optipng({optimizationLevel: 5}),
+        imagemin.svgo({plugins: [{removeViewBox: true}]})
+      ]))
+      .pipe(gulp.dest(path.build.img))
       .pipe(reload({stream:true}));
   });
+
+  // gulp.task('image:build', function(){
+  //   gulp.src(path.src.img) // выбираем наши картинки
+  //     .pipe(imagemin({ // сжимаем их
+  //       progressive: true,
+  //       svgoPlugins: [{removeViewBox: false}],
+  //       use: [imageminPngquant()],
+  //       interlaced: true
+  //     }))
+  //     .pipe(gulp.dest(path.build.img)) // бросаем их в папку app
+  //     .pipe(reload({stream:true}));
+  // });
 
 // собираем шрифты
   gulp.task('fonts:build', function(){
@@ -139,7 +156,7 @@ var gulp = require('gulp'),
 
 // соберем все таски в один
   gulp.task('build', [
-    'jade:build',
+    'pug:build',
     'sass:build',
     'js:build',
     'image:build',
@@ -154,13 +171,13 @@ gulp.task('webserver',['build'], function () {
 });
 
 // очистка
-gulp.task('clean', function (cb) {
-  rimraf(path.clean, cb);
+gulp.task('clean', function() {
+  return del(path.clean);
 });
 
 // watch за всеми тасками
   gulp.task('watch', function(){
-    gulp.watch(path.watch.jade, ['jade:build']);
+    gulp.watch(path.watch.pug, ['pug:build']);
     gulp.watch(path.watch.sass, ['sass:build']);
     gulp.watch(path.watch.js,   ['js:build']);
   });
