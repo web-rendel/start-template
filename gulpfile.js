@@ -8,9 +8,11 @@ var gulp = require('gulp'),
     sourcemaps = require('gulp-sourcemaps'),
     autoprefixer = require('gulp-autoprefixer'),
     concatJS = require('gulp-concat'),
+    spritesmith = require('gulp.spritesmith'),
     concatCSS = require('gulp-concat-css'),
     browserSync = require('browser-sync'),
     del = require('del'),
+    buffer = require('vinyl-buffer'),
     reload = browserSync.reload;
 
 
@@ -64,6 +66,18 @@ var gulp = require('gulp'),
       fonts: 'src/fonts/**/*.*'
     },
     clean: './app'
+  }
+
+  let timestamp = Date.now();
+
+  var options = {
+    spritesmith: {
+      imgName: 'sprite.png',
+      imgPath: "../img/sprite.png",
+      cssName: 'sprites.sass',
+      algorithm: 'binary-tree',
+      padding: 8
+    }
   }
 
 // собираем библиотеки js и css
@@ -124,6 +138,16 @@ var gulp = require('gulp'),
   //       .pipe(gulp.dest(path.build.img));
   //   });
 
+  gulp.task('sprite', function () {
+    var spriteData = gulp.src('src/img/sprites/*.png')
+    .pipe(spritesmith(options.spritesmith));
+    spriteData.img.pipe(buffer())
+        .pipe(gulp.dest('src/img/'));
+    spriteData.css.pipe(buffer())
+        .pipe(gulp.dest('src/sass/'));
+    return spriteData.img.pipe(buffer());
+  });
+
   gulp.task('image:build', function(){
     gulp.src(path.src.img)
       .pipe(imagemin([
@@ -162,7 +186,8 @@ var gulp = require('gulp'),
     'image:build',
     'fonts:build',
     'build-requirences-css',
-    'biuld-requirences-js'
+    'biuld-requirences-js',
+    'sprite'
   ])
 
 // web-server
@@ -180,6 +205,7 @@ gulp.task('clean', function() {
     gulp.watch(path.watch.pug, ['pug:build']);
     gulp.watch(path.watch.sass, ['sass:build']);
     gulp.watch(path.watch.js,   ['js:build']);
+    gulp.watch(path.watch.img,   ['image:build']);
   });
 
 gulp.task('default', ['build', 'webserver', 'watch']);

@@ -29,8 +29,10 @@
     "gulp-sourcemaps": "^2.6.0",
     "gulp-uglify": "~3.0.0",
     "gulp-watch": "~4.3.11",
+    "gulp.spritesmith": "^6.5.1",
     "jquery": "^3.2.1",
     "modernizr": "^3.5.0",
-    "node-bourbon": "^4.2.8"
+    "node-bourbon": "^4.2.8",
+    "vinyl-buffer": "^1.0.0"
   }
 }

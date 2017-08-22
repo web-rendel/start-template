@@ -1,6 +1,7 @@
 @import "bourbon"
 @import "vars.sass"
 @import "fonts.sass"
+@import "sprites.sass"
 
 
 body
@@ -42,6 +43,9 @@ body textarea:required:valid
 .text-center
 	text-align: center
 
+.block
+	@include sprite($arrow-right-link)
+	display: block
 
 
 //ALWAYS END
