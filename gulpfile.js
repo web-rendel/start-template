@@ -80,6 +80,29 @@ var gulp = require('gulp'),
     }
   }
 
+  gulp.task('sprite', function () {
+    var spriteData = gulp.src('src/img/sprites/*.png')
+    .pipe(spritesmith(options.spritesmith));
+    spriteData.img.pipe(buffer())
+        .pipe(gulp.dest('src/img/'));
+    spriteData.css.pipe(buffer())
+        .pipe(gulp.dest('src/sass/'))
+        .pipe(reload({stream:true}));
+    // return spriteData.img.pipe(buffer());
+  });
+
+  gulp.task('image:build', function(){
+    gulp.src(['!src/img/sprites/**/*', path.src.img])
+      .pipe(imagemin([
+        imagemin.gifsicle({interlaced: true}),
+        imagemin.jpegtran({progressive: true}),
+        imagemin.optipng({optimizationLevel: 5}),
+        imagemin.svgo({plugins: [{removeViewBox: true}]})
+      ]))
+      .pipe(gulp.dest(path.build.img))
+      .pipe(reload({stream:true}));
+  });
+
 // собираем библиотеки js и css
   gulp.task('build-requirences-css', function(){
     gulp.src(requirences.css)
@@ -138,27 +161,9 @@ var gulp = require('gulp'),
   //       .pipe(gulp.dest(path.build.img));
   //   });
 
-  gulp.task('sprite', function () {
-    var spriteData = gulp.src('src/img/sprites/*.png')
-    .pipe(spritesmith(options.spritesmith));
-    spriteData.img.pipe(buffer())
-        .pipe(gulp.dest('src/img/'));
-    spriteData.css.pipe(buffer())
-        .pipe(gulp.dest('src/sass/'));
-    return spriteData.img.pipe(buffer());
-  });
+ 
 
-  gulp.task('image:build', function(){
-    gulp.src(path.src.img)
-      .pipe(imagemin([
-        imagemin.gifsicle({interlaced: true}),
-        imagemin.jpegtran({progressive: true}),
-        imagemin.optipng({optimizationLevel: 5}),
-        imagemin.svgo({plugins: [{removeViewBox: true}]})
-      ]))
-      .pipe(gulp.dest(path.build.img))
-      .pipe(reload({stream:true}));
-  });
+
 
   // gulp.task('image:build', function(){
   //   gulp.src(path.src.img) // выбираем наши картинки
@@ -181,13 +186,14 @@ var gulp = require('gulp'),
 // соберем все таски в один
   gulp.task('build', [
     'pug:build',
-    'sass:build',
     'js:build',
+    'sprite',
     'image:build',
+    'sass:build',
     'fonts:build',
     'build-requirences-css',
     'biuld-requirences-js',
-    'sprite'
+    
   ])
 
 // web-server
@@ -202,10 +208,12 @@ gulp.task('clean', function() {
 
 // watch за всеми тасками
   gulp.task('watch', function(){
-    gulp.watch(path.watch.pug, ['pug:build']);
-    gulp.watch(path.watch.sass, ['sass:build']);
-    gulp.watch(path.watch.js,   ['js:build']);
-    gulp.watch(path.watch.img,   ['image:build']);
+    gulp.watch(path.watch.pug,    ['pug:build']);
+    gulp.watch(path.watch.sass,   ['sass:build']);
+    gulp.watch(path.watch.js,     ['js:build']);
+    gulp.watch(path.watch.img,    ['sprite']);
+    gulp.watch(path.watch.img,    ['image:build']);
+    
   });
 
 gulp.task('default', ['build', 'webserver', 'watch']);
