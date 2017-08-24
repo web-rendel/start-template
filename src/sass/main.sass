@@ -1,7 +1,7 @@
 @import "bourbon"
 @import "vars.sass"
 @import "fonts.sass"
-@import "sprites.sass"
+@import "../sprites/sprite.sass"
 
 
 body
@@ -44,14 +44,14 @@ body textarea:required:valid
 	text-align: center
 
 .block
-	@include sprite($check_auto_ico)
+	@include sprite($check-auto-ico)
 	display: block
 .block-1
 	@include sprite($check_auto_ico2)
 	display: block
 .block-2
 	@include sprite($check_auto_ico3)
-	display: block
+	// display: block
 .block-3
 	// @include sprite($orders_icon)
 	// display: block

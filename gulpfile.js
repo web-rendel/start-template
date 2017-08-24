@@ -80,19 +80,63 @@ var gulp = require('gulp'),
     }
   }
 
-  gulp.task('sprite', function () {
-    var spriteData = gulp.src('src/img/sprites/*.png')
-    .pipe(spritesmith(options.spritesmith));
-    spriteData.img.pipe(buffer())
-        .pipe(gulp.dest('src/img/'));
-    spriteData.css.pipe(buffer())
-        .pipe(gulp.dest('src/sass/'))
-        .pipe(reload({stream:true}));
-    // return spriteData.img.pipe(buffer());
+
+  // gulp.task('sprite', function () {
+  //   var spriteData = gulp.src('src/img/sprites/*.png')
+  //   .pipe(spritesmith(options.spritesmith));
+  //   spriteData.img.pipe(buffer())
+  //       .pipe(gulp.dest('src/img/'));
+  //   spriteData.css.pipe(buffer())
+  //       .pipe(gulp.dest('src/sass/'))
+  //       .pipe(reload({stream:true}));
+  //   spriteData.img.pipe(buffer());
+  // });
+
+  // gulp.task('sprite', function () {
+  //   var spriteData = gulp.src('src/img/sprites/*.png').pipe(spritesmith({
+  //     imgName: 'sprite.png',
+  //     cssName: 'sprite.sass'
+  //   }))
+  //   .pipe(gulp.dest('src/sprites/'));
+  // });
+
+  // Удаление старых файлов
+  gulp.task('sprite-clean', function (cb) {
+    del(['./app/img/sprites/*.png'], cb);
+  });
+
+  // Создание спрайтов
+  gulp.task('sprite-create', ['sprite-clean'], function () {
+    var fileName = 'sprite-' + Math.random().toString().replace(/[^0-9]/g, '') + '.png';
+
+    var spriteData = gulp.src('./src/img/sprites/*.png')
+        .pipe(spritesmith({
+            imgName: fileName,
+            cssName: 'sprite.sass',
+            cssFormat: 'sass',
+            cssVarMap: function (sprite) {
+                sprite.name = 'icon-' + sprite.name;
+            },
+            imgPath: '../img/' + fileName
+        }));
+
+    spriteData.img
+        .pipe(imagemin({
+            progressive: true,
+            svgoPlugins: [{removeViewBox: false}],
+            //use: [pngquant()]
+        }))
+        .pipe(gulp.dest('./app/img/'));
+
+    spriteData.css
+        .pipe(gulp.dest('./src/sass/'));
+
+    return spriteData;
   });
 
   gulp.task('image:build', function(){
-    gulp.src(['!src/img/sprites/**/*', path.src.img])
+    // gulp.src(['!src/img/sprites/**/*', path.src.img])
+    gulp.src(path.src.img)
       .pipe(imagemin([
         imagemin.gifsicle({interlaced: true}),
         imagemin.jpegtran({progressive: true}),
@@ -102,7 +146,7 @@ var gulp = require('gulp'),
       .pipe(gulp.dest(path.build.img))
       .pipe(reload({stream:true}));
   });
-
+  
 // собираем библиотеки js и css
   gulp.task('build-requirences-css', function(){
     gulp.src(requirences.css)
@@ -155,6 +199,8 @@ var gulp = require('gulp'),
       .pipe(reload({stream: true})); //И перезагрузим наш сервер для обновлений
   });
 
+  
+
 //собираем картинки
   //  gulp.task('image:build', function(){
   //     gulp.src(path.src.img)
@@ -187,13 +233,11 @@ var gulp = require('gulp'),
   gulp.task('build', [
     'pug:build',
     'js:build',
-    'sprite',
     'image:build',
     'sass:build',
     'fonts:build',
     'build-requirences-css',
     'biuld-requirences-js',
-    
   ])
 
 // web-server
@@ -211,7 +255,6 @@ gulp.task('clean', function() {
     gulp.watch(path.watch.pug,    ['pug:build']);
     gulp.watch(path.watch.sass,   ['sass:build']);
     gulp.watch(path.watch.js,     ['js:build']);
-    gulp.watch(path.watch.img,    ['sprite']);
     gulp.watch(path.watch.img,    ['image:build']);
     
   });
