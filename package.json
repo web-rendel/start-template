@@ -4,6 +4,9 @@
   "description": "",
   "main": "index.js",
   "scripts": {
+     "build": "rollup -c",
+    "start": "rollup -c -w",
+    "serve": "http-server ./demo -c-0 -p3001",
     "test": "echo \"Error: no test specified\" && exit 1"
   },
   "repository": {
@@ -31,6 +34,9 @@
     "gulp-watch": "~4.3.11",
     "jquery": "^3.2.1",
     "modernizr": "^3.5.0",
-    "node-bourbon": "^4.2.8"
+    "node-bourbon": "^4.2.8",
+    "rollup-plugin-pug": "^0.1.6",
+    "rollup-plugin-sass": "^0.5.3",
+    "rollup-plugin-uglify": "^2.0.1"
   }
 }
