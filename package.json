@@ -1,42 +1,46 @@
 {
-  "name": "start-template",
-  "version": "0.0.0",
+  "name": "angular2-attract_group",
+  "version": "1.0.0",
   "description": "",
-  "main": "index.js",
+  "main": "app/app.module.ts",
   "scripts": {
-     "build": "rollup -c",
-    "start": "rollup -c -w",
-    "serve": "http-server ./demo -c-0 -p3001",
-    "test": "echo \"Error: no test specified\" && exit 1"
+    "clear": "fuser -k -n tcp 3030",
+    "start": "webpack-dev-server --inline --colors --progress --display-error-details --display-cached --port 3030  --content-base app",
+    "build": "webpack",
+    "postinstall": "typings install",
+    "tsc": "tsc",
+    "tsc:w": "tsc -w",
+    "typings": "typings"
   },
   "repository": {
     "type": "git",
-    "url": "https://github.com/web-rendel/blog.git"
+    "url": "git+https://rendel32@bitbucket.org/web-dev-org/attract_group.git"
   },
-  "author": "",
-  "license": "BSD-2-Clause",
-  "bugs": {
-    "url": "https://github.com/web-rendel/blog/issues"
+  "dependencies": {
+    "bootstrap": "^4.0.0-alpha.6",
+    "font-awesome": "^4.7.0"
   },
   "devDependencies": {
-    "browser-sync": "~2.18.12",
-    "del": "^3.0.0",
-    "gulp": "~3.9.1",
-    "gulp-autoprefixer": "~4.0.0",
-    "gulp-concat": "~2.6.1",
-    "gulp-concat-css": "~2.3.0",
-    "gulp-imagemin": "^3.3.0",
-    "gulp-minify-css": "~1.2.4",
-    "gulp-pug": "^3.3.0",
-    "gulp-sass": "~3.1.0",
-    "gulp-sourcemaps": "^2.6.0",
-    "gulp-uglify": "~3.0.0",
-    "gulp-watch": "~4.3.11",
-    "jquery": "^3.2.1",
-    "modernizr": "^3.5.0",
-    "node-bourbon": "^4.2.8",
-    "rollup-plugin-pug": "^0.1.6",
-    "rollup-plugin-sass": "^0.5.3",
-    "rollup-plugin-uglify": "^2.0.1"
+    "bootstrap": "^4.0.0-alpha.6",
+    "concurrently": "^2.2.0",
+    "css-loader": "^0.28.0",
+    "css-to-string-loader": "^0.1.1",
+    "extract-text-webpack-plugin": "^1.0.1",
+    "file-loader": "^0.9.0",
+    "font-awesome": "^4.7.0",
+    "html-webpack-plugin": "^2.22.0",
+    "image-webpack-loader": "^3.0.0",
+    "node-sass": "^4.5.0",
+    "pug": "^2.0.0-beta9",
+    "pug-loader": "^2.3.0",
+    "raw-loader": "^0.5.1",
+    "resolve-url-loader": "^1.6.0",
+    "sass-loader": "^4.0.2",
+    "style-loader": "^0.13.1",
+    "to-string-loader": "^1.1.5",
+    "url-loader": "^0.5.7",
+    "webpack": "1.14.0",
+    "webpack-dev-middleware": "^1.9.0",
+    "webpack-dev-server": "1.16.2"
   }
 }
