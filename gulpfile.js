@@ -3,7 +3,6 @@ var gulp = require('gulp'),
     sass = require('gulp-sass'),
     pug = require('gulp-pug'),
     uglify = require('gulp-uglify'),
-    cssmin = require('gulp-minify-css'),
     imagemin = require('gulp-imagemin'),
     sourcemaps = require('gulp-sourcemaps'),
     autoprefixer = require('gulp-autoprefixer'),
@@ -70,7 +69,6 @@ var gulp = require('gulp'),
   gulp.task('build-requirences-css', function(){
     gulp.src(requirences.css)
       .pipe(concatCSS('style.css'))
-      // .pipe(cssmin())
       .pipe(gulp.dest(path.build.sass))
       .pipe(reload({stream: true})); //И перезагрузим наш сервер для обновлений
   });
@@ -101,7 +99,6 @@ var gulp = require('gulp'),
         .pipe(sass({includePaths: require('node-bourbon').includePaths }).on('error', sass.logError))
         .pipe(sass({outputStyle: 'expanded'}).on('error', sass.logError)) // посмотреть вместо expanded -compressed
         .pipe(autoprefixer({browsers: ['last 2 versions'], cascade: false}))
-        //.pipe(cssmin()) // сжимаем наш sass
         .pipe(concatCSS('main.css'))
         .pipe(sourcemaps.write()) // пропишем карты
         .pipe(gulp.dest(path.build.sass)) // билдим файл в папку app
@@ -135,18 +132,6 @@ var gulp = require('gulp'),
       .pipe(gulp.dest(path.build.img))
       .pipe(reload({stream:true}));
   });
-
-  // gulp.task('image:build', function(){
-  //   gulp.src(path.src.img) // выбираем наши картинки
-  //     .pipe(imagemin({ // сжимаем их
-  //       progressive: true,
-  //       svgoPlugins: [{removeViewBox: false}],
-  //       use: [imageminPngquant()],
-  //       interlaced: true
-  //     }))
-  //     .pipe(gulp.dest(path.build.img)) // бросаем их в папку app
-  //     .pipe(reload({stream:true}));
-  // });
 
 // собираем шрифты
   gulp.task('fonts:build', function(){
